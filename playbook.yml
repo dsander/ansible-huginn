@@ -1,0 +1,6 @@
+- include: tasks/general.yml
+- include: tasks/firewall.yml
+- include: tasks/ruby.yml
+- include: tasks/postgresql.yml
+- include: tasks/nginx.yml
+- include: tasks/huginn.yml

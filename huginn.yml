@@ -1,0 +1,3 @@
+ssl: false
+huginn_database_adapter: postgresql
+huginn_database_password: password

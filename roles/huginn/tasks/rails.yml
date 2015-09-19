@@ -1,0 +1,85 @@
+- name: Check out the source
+  git:
+    repo=https://github.com/cantino/huginn.git
+    dest=~/huginn
+    version=master
+    force=true
+  sudo: yes
+  sudo_user: "{{name}}"
+
+- name: Create the pid directory
+  file:
+    path: ~/huginn/tmp/pids
+    mode: 0750
+    group: www-data
+    state: directory
+  sudo: yes
+  sudo_user: "{{name}}"
+
+- name: Create the sockets directory
+  file:
+    path: ~/huginn/tmp/sockets
+    mode: 0750
+    group: www-data
+    state: directory
+  sudo: yes
+  sudo_user: "{{name}}"
+
+- name: Install .env
+  template: src=.env.j2 dest=~/huginn/.env owner={{name}} group=www-data mode=0600
+  sudo: yes
+  sudo_user: "{{name}}"
+
+- name: Install unicorn config
+  template: src=unicorn.rb.j2 dest=~/huginn/config/unicorn.rb owner={{name}} group=www-data mode=0600
+  sudo: yes
+  sudo_user: "{{name}}"
+
+- name: Install Profile
+  template: src=Procfile.j2 dest=~/huginn/Procfile owner={{name}} group=www-data mode=0600
+  sudo: yes
+  sudo_user: "{{name}}"
+
+- name: Install logrotate config
+  template: src=logrotate.j2 dest=/etc/logrotate.d/{{name}} owner=root group=root mode=0644
+
+- name: Add pg gem to Gemfile
+  shell: echo "gem 'pg'" >> Gemfile chdir=/home/huginn/huginn
+  sudo: yes
+  sudo_user: "{{name}}"
+  when: huginn_database_adapter == 'postgresql'
+
+- name: Install gems
+  shell: bundle install --deployment --without development test chdir=/home/huginn/huginn
+  sudo: yes
+  sudo_user: "{{name}}"
+
+- name: Create the database
+  shell: bundle exec rake db:create RAILS_ENV=production chdir=/home/huginn/huginn
+  sudo: yes
+  sudo_user: "{{name}}"
+
+- name: Migrate the database
+  shell: bundle exec rake db:migrate RAILS_ENV=production chdir=/home/huginn/huginn
+  sudo: yes
+  sudo_user: "{{name}}"
+
+- name: Check if database is seeded
+  shell: RAILS_ENV=production bundle exec rails runner "exit(-1) if User.count == 0" chdir=/home/huginn/huginn
+  register: database_seeded
+  ignore_errors: True
+
+- name: Seed database defaults
+  shell: bundle exec rake db:seed RAILS_ENV=production chdir=/home/huginn/huginn
+  sudo: yes
+  sudo_user: "{{name}}"
+  when: database_seeded|failed
+
+- name: Precompile the assets
+  shell: bundle exec rake assets:precompile RAILS_ENV=production chdir=/home/huginn/huginn
+  sudo: yes
+  sudo_user: "{{name}}"
+
+- name: Export init scripts
+  shell: rake production:export chdir=/home/huginn/huginn
+  sudo: yes

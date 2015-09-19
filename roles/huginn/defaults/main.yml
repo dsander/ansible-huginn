@@ -1,0 +1,7 @@
+---
+name: huginn
+ssl: true
+
+huginn_database_adapter: mysql2
+huginn_database_password: password
+huginn_remove_default_nginx_config: false

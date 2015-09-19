@@ -1,0 +1,14 @@
+##
+# Prepare rails apps
+##
+- hosts: all
+  become: yes
+
+  pre_tasks:
+    - include_vars: ../huginn.yml
+
+  roles:
+    - { role: huginn,
+        name: huginn,
+        domain_name: _,
+      }

@@ -1,0 +1,48 @@
+##
+# Install ruby
+##
+- hosts: all
+  become: yes
+  pre_tasks:
+    - name: apt-get update
+      apt: update_cache=yes
+
+    - name: apt-get upgrade
+      apt: upgrade=full
+
+    - name: Install common packages
+      apt: name={{item}} state=present
+      with_items:
+        - build-essential
+        - git
+        - zlib1g-dev
+        - libyaml-dev
+        - libssl-dev
+        - libgdbm-dev
+        - libreadline-dev
+        - libncurses5-dev
+        - libffi-dev
+        - curl
+        - checkinstall
+        - libxml2-dev
+        - libxslt-dev
+        - libcurl4-openssl-dev
+        - libicu-dev
+        - logrotate
+        - python-docutils
+        - pkg-config
+        - cmake
+        - nodejs
+        - python-httplib2
+        - python-passlib
+        - graphviz
+        - libmysqlclient-dev
+        - runit
+
+  roles:
+     - role: bennojoy.ntp
+
+     - { role: MichaelRigart.brightbox-ruby,
+         brightbox_ruby_pkg_version: ruby2.2,
+         brightbox_ruby_packages: [ruby2.2, ruby2.2-dev],
+         brightbox_ruby_gems: [backup, rake, bundler] }

@@ -1,0 +1,12 @@
+- name: Check if SSH key of github.com is known
+  shell: ssh-keygen -F github.com
+  register: ssh_key_check
+  ignore_errors: yes
+  sudo: yes
+  sudo_user: "{{name}}"
+
+- name: Ensure the SSH key of github.com is known
+  shell: ssh-keyscan github.com >> ~/.ssh/known_hosts
+  when: "'github.com' not in ssh_key_check.stdout"
+  sudo: yes
+  sudo_user: "{{name}}"

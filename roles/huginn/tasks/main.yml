@@ -1,0 +1,6 @@
+- include: user.yml
+- include: known_hosts.yml
+- include: postgresql.yml
+  when: huginn_database_adapter == 'postgresql'
+- include: rails.yml
+- include: nginx.yml

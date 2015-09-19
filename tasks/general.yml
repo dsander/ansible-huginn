@@ -1,0 +1,7 @@
+---
+- hosts: all
+  become: yes
+
+  tasks:
+    - name: 'Update /etc/environment and set LC_ALL'
+      copy: src=../files/environment dest=/etc/environment owner=root group=root mode=0644

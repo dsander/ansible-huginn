@@ -1,0 +1,10 @@
+##
+# Install ruby
+##
+- hosts: all
+  become: yes
+  roles:
+    - role: jdauphant.nginx
+      nginx_official_repo: True
+      nginx_installation_type: packages
+      nginx_http_params: ["sendfile on"]

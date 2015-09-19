@@ -1,0 +1,21 @@
+- name: 'Create additional group {{name}}'
+  group: name={{name}} state=present
+
+- name: 'Create the app user {{name}}'
+  user:
+    name: '{{name}}'
+    group: www-data
+    groups: '{{name}}'
+    comment: '{{name}}'
+    generate_ssh_key: yes
+    ssh_key_bits: 4096
+    shell: /bin/bash
+
+- name: 'Set homedir permissions'
+  file:
+    name: '/home/{{name}}'
+    mode: 0750
+
+- name: Set authorized_keys for {{name}}
+  copy: src={{ssh_public_key}} dest=/home/{{name}}/.ssh/authorized_keys owner={{name}} group={{name}} mode=0600
+  when: ssh_public_key is defined

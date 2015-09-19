@@ -1,0 +1,19 @@
+##
+# Install postgresql
+##
+- hosts: all
+  become: yes
+
+  pre_tasks:
+    - name: Delete /etc/locale.gen since it breaks the locale-gen ansible module
+      file: path=/etc/locale.gen state=absent
+
+  roles:
+     - { role: ANXS.postgresql,
+         postgresql_version: 9.4,
+         postgresql_locale: en_US.UTF-8,
+       }
+
+  post_tasks:
+    - name: Install libpq
+      apt: name=libpq-dev state=present

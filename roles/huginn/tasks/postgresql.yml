@@ -1,0 +1,26 @@
+- name: PostgreSQL | Make sure the PostgreSQL user is present
+  postgresql_user:
+    name: "{{name}}"
+    state: present
+    login_user: "postgres"
+  sudo: yes
+  sudo_user: "postgres"
+
+- name: PostgreSQL | Make sure the PostgreSQL database is present
+  postgresql_db:
+    name: "{{name}}_production"
+    owner: "{{name}}"
+    state: present
+  sudo: yes
+  sudo_user: "postgres"
+  register: database_creation
+
+- name: PostgreSQL | Make sure the PostgreSQL user has access to the database
+  postgresql_user:
+    name: "{{name}}"
+    db: "{{name}}_production"
+    priv: ALL
+    state: present
+    login_user: "postgres"
+  sudo: yes
+  sudo_user: "postgres"

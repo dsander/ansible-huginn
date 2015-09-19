@@ -1,0 +1,5 @@
+production:
+  adapter: {% if postgis%}postgis{% else%}postgresql{% endif %} 
+  database: {{name}}_production
+  pool: 5
+  timeout: 5000

@@ -1,0 +1,30 @@
+- name: Install nginx SSL location
+  template: src=nginx-site-ssl.j2 dest=/etc/nginx/sites-enabled/{{domain_name}}.conf owner=root group=root mode=0644
+  when: ssl == true
+
+- name: Install nginx location
+  template: src=nginx-site.j2 dest=/etc/nginx/sites-enabled/{{domain_name}}.conf owner=root group=root mode=0644
+  when: ssl == false
+
+- name: Create htpasswd file
+  htpasswd: path=/etc/nginx/{{name}}.htpasswd name={{htpasswd_user}} password={{htpasswd_password}} owner=root group=www-data mode=0640
+  when: htpasswd_user is defined
+
+- name: 'Ensure the /etc/nginx/ssl directory exists'
+  file: path=/etc/nginx/ssl state=directory owner=root mode=0700
+  when: ssl == true
+
+- name: Upload SSL pem file
+  copy: src={{domain_name}}.pem dest=/etc/nginx/ssl/{{domain_name}}.pem owner=root mode=0600
+  when: ssl == true
+
+- name: Upload SSL key file
+  copy: src={{domain_name}}.key dest=/etc/nginx/ssl/{{domain_name}}.key owner=root mode=0600
+  when: ssl == true
+
+- name: Remove default config
+  file: path=/etc/nginx/sites-enabled/default.conf state=absent
+  when: huginn_remove_default_nginx_config == true
+
+- name: Reload nginx
+  service: name=nginx state=reloaded
