@@ -43,12 +43,6 @@
 - name: Install logrotate config
   template: src=logrotate.j2 dest=/etc/logrotate.d/{{name}} owner=root group=root mode=0644
 
-- name: Add pg gem to Gemfile
-  shell: echo "gem 'pg'" >> Gemfile chdir=/home/huginn/huginn
-  sudo: yes
-  sudo_user: "{{name}}"
-  when: huginn_database_adapter == 'postgresql'
-
 - name: Install gems
   shell: bundle install --deployment --without development test chdir=/home/huginn/huginn
   sudo: yes
